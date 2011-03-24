@@ -1,0 +1,27 @@
+#!/bin/zsh
+
+TARGET_NAME="libgit2-iOS"
+PLIST_FILES="Info.plist"
+BUILD_TYPE=Release
+
+# First, build the device and simulator versions
+xcodebuild -configuration Release -target "$TARGET_NAME" -sdk iphoneos clean build
+xcodebuild -configuration Release -target "$TARGET_NAME" -sdk iphonesimulator clean build
+
+# Check that this is what your static libraries are called
+LIBRARY_INPUT_ARM_FILES="build/$BUILD_TYPE-iphoneos/$TARGET_NAME.a"
+LIBRARY_INPUT_I386_FILES="build/$BUILD_TYPE-iphonesimulator/$TARGET_NAME.a"
+
+# The trick for creating a fully usable library is to use lipo to glue the
+# different library versions together into one file. When an application is
+# linked to this library, the linker will extract the appropriate platform
+# version and use that. The library file is given the same name as the
+lipo \
+  "$LIBRARY_INPUT_ARM_FILES" \
+  -create \
+  -arch i386 "$LIBRARY_INPUT_I386_FILES" \
+  -o $TARGET_NAME.a
+
+# Now copy the assets over (i.e. public header files and plist files)
+
+echo "Framework create! Located at $TARGET_NAME.a"
