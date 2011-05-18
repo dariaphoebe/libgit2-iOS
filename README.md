@@ -1,6 +1,9 @@
 HOW TO BUILD
 ------------
 
+** Only works with Xcode3 right now. Use `xcodeselect` if you need to
+change it. **
+
 *  Clone it
 *  `git submodule update --init`
 *  `./build_lib`
